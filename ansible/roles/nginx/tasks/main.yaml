@@ -1,0 +1,52 @@
+- name: Instalar Nginx
+  apt:
+    pkg: nginx
+
+- name: Crear VirtualHosts
+  template:
+    src: etc/nginx/sites-available/vhost.j2
+    dest: "/etc/nginx/sites-available/{{ item.name }}.conf"
+    owner: root
+    group: root
+    mode: u+rw,g+r,o+r
+  with_items:
+    - "{{ virtualhosts_activate }}"
+  notify: restart nginx
+
+- name: Activar Virtualhost
+  file:
+    src: "/etc/nginx/sites-available/{{ item.name }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ item.name }}.conf"
+    state: link
+    mode: u+rwx,g+rwx,o+rwx
+  with_items:
+    - "{{ virtualhosts_activate }}"
+  notify: restart nginx
+
+- name: Crear srv
+  file:
+   path: /srv/www
+   owner: www-data
+   group: www-data
+   mode: 0775
+   recurse: yes
+
+- name: Crear DocumentRoots
+  file:
+    path: "{{ item.datos.documentroot }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: u+rwx,g+rx,o+rx
+  with_items:
+    - "{{ virtualhosts_activate }}"
+
+- name: Copiar index.html Document Root
+  copy:
+    src: "index_{{ item.name }}.html"
+    dest: "{{ item.datos.documentroot }}/index.html"
+    owner: www-data
+    group: www-data
+    mode: u+rw,g+r,o+r
+  with_items:
+    - "{{ virtualhosts_activate }}"

@@ -1,0 +1,11 @@
+# Activar VirtualHosts
+
+virtualhosts_activate:
+  - name: vhost1
+    datos:
+      nameserver: www.pagina1.org
+      documentroot: /srv/www/pagina1
+  - name: vhost2  
+    datos:
+      nameserver: www.pagina2.org
+      documentroot: /srv/www/pagina2

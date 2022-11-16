@@ -1,0 +1,13 @@
+- name: Instalar phpfpm
+  apt:
+    name: php-fpm
+
+- name: Copiar info.php
+  copy:
+    src: info.php
+    dest: "{{ item.datos.documentroot }}/info.php"
+    owner: www-data
+    group: www-data
+    mode: u+rw,g+r,o+r
+  with_items:
+    - "{{ virtualhosts_activate }}"
